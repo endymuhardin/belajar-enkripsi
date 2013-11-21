@@ -20,7 +20,7 @@ public class KeyStretchingDemo {
         String algoritma = "PBKDF2WithHmacSHA1";
         int panjangKey = 256;
         
-        PBEKeySpec keyspec = new PBEKeySpec(password.toCharArray(), salt.getBytes(), perulangan, panjangKey);
+        PBEKeySpec keyspec = new PBEKeySpec(password.toCharArray(), salt.getBytes("UTF-8"), perulangan, panjangKey);
         SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(algoritma);
         SecretKey key = keyFactory.generateSecret(keyspec);
         
