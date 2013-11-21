@@ -1,9 +1,7 @@
 package com.muhardin.endy.belajar.enkripsi;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -62,22 +60,20 @@ public class AESDecryptionDemo {
         }
         
         // load key
-        BufferedReader keyReader = new BufferedReader(new FileReader(keyFile));
-        String key = keyReader.readLine();
-        if(key == null){
+        List<String> keys = Files.readAllLines(keyFile.toPath(), Charset.forName("UTF-8"));
+        if(keys.isEmpty()){
             throw new IllegalStateException("File key invalid");
         }
-        keyReader.close();
+        String key = keys.get(0);
         System.out.println("Key : "+key);
         SecretKeySpec keySpec = new SecretKeySpec(Base64.decodeBase64(key), algoritmaKey);
         
         // load IV
-        BufferedReader ivReader = new BufferedReader(new FileReader(ivFile));
-        String iv = ivReader.readLine();
-        if(iv == null){
+        List<String> ivs = Files.readAllLines(ivFile.toPath(), Charset.forName("UTF-8"));
+        if(ivs.isEmpty()){
             throw new IllegalStateException("File IV invalid");
         }
-        keyReader.close();
+        String iv = ivs.get(0);
         System.out.println("IV : "+iv);
         IvParameterSpec ivSpec = new IvParameterSpec(Base64.decodeBase64(iv));
         

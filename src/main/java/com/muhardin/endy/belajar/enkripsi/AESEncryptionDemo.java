@@ -3,9 +3,7 @@ package com.muhardin.endy.belajar.enkripsi;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
@@ -42,9 +40,7 @@ public class AESEncryptionDemo {
         KeyGenerator keygen = KeyGenerator.getInstance(algoritmaKey);
         keygen.init(256);
         SecretKey key = keygen.generateKey();
-        FileWriter keyWriter = new FileWriter(keyFile);
-        keyWriter.write(Base64.encodeBase64String(key.getEncoded()));
-        keyWriter.close();
+        Files.write(keyFile.toPath(), Base64.encodeBase64String(key.getEncoded()).getBytes(), StandardOpenOption.CREATE);
         
         // inisialisasi AES
         Cipher cipher = Cipher.getInstance(algoritmaEnkripsi);
@@ -52,9 +48,7 @@ public class AESEncryptionDemo {
         
         // generate IV
         byte[] iv = cipher.getParameters().getParameterSpec(IvParameterSpec.class).getIV();
-        FileWriter ivWriter = new FileWriter(ivFile);
-        ivWriter.write(Base64.encodeBase64String(iv));
-        ivWriter.close();
+        Files.write(ivFile.toPath(), Base64.encodeBase64String(iv).getBytes(), StandardOpenOption.CREATE);
         
         // output terenkripsi
         CipherOutputStream writer = 
@@ -78,9 +72,9 @@ public class AESEncryptionDemo {
         
         // key untuk HMAC
         SecretKey keyHmac = keygenHmac.generateKey();
-        FileWriter keyHmacWriter = new FileWriter(hmacKeyFile);
-        keyHmacWriter.write(Base64.encodeBase64String(keyHmac.getEncoded()));
-        keyHmacWriter.close();
+        Files.write(hmacKeyFile.toPath(), 
+                Base64.encodeBase64String(keyHmac.getEncoded()).getBytes(), 
+                StandardOpenOption.CREATE);
         
         // buat HMAC
         Mac hmacGenerator = Mac.getInstance(algoritmaHmac);
