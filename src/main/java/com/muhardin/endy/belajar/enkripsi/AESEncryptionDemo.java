@@ -4,9 +4,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.KeyGenerator;
+import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import org.apache.commons.codec.binary.Base64;
@@ -19,15 +23,20 @@ public class AESEncryptionDemo {
         String fileEncrypted = "lyric-enc.txt";
         String fileKey = "key.txt";
         String fileIv = "iv.txt";
+        String fileHmacKey = "hmac-key.txt";
+        String fileHmac = "hmac.txt";
         
         String algoritmaKey = "AES";
         String algoritmaEnkripsi = "AES/CBC/PKCS5Padding";
+        String algoritmaHmac = "HmacSHA512";
         
         // load file
         File plain = new File("target"+File.separator+"classes"+File.separator+filePlain);
         File keyFile = new File("target"+File.separator+"classes"+File.separator+fileKey);
         File ivFile = new File("target"+File.separator+"classes"+File.separator+fileIv);
         File encryptedFile = new File("target"+File.separator+"classes"+File.separator+fileEncrypted);
+        File hmacKeyFile = new File("target"+File.separator+"classes"+File.separator+fileHmacKey);
+        File hmacFile = new File("target"+File.separator+"classes"+File.separator+fileHmac);
         
         // generate random key
         KeyGenerator keygen = KeyGenerator.getInstance(algoritmaKey);
@@ -62,5 +71,21 @@ public class AESEncryptionDemo {
         
         reader.close();
         writer.close();
+        
+        // HMAC untuk memastikan integritas data
+        KeyGenerator keygenHmac = KeyGenerator.getInstance(algoritmaHmac);
+        keygenHmac.init(256);
+        
+        // key untuk HMAC
+        SecretKey keyHmac = keygenHmac.generateKey();
+        FileWriter keyHmacWriter = new FileWriter(hmacKeyFile);
+        keyHmacWriter.write(Base64.encodeBase64String(keyHmac.getEncoded()));
+        keyHmacWriter.close();
+        
+        // buat HMAC
+        Mac hmacGenerator = Mac.getInstance(algoritmaHmac);
+        hmacGenerator.init(keyHmac);
+        byte[] hmac = hmacGenerator.doFinal(Files.readAllBytes(encryptedFile.toPath()));
+        Files.write(hmacFile.toPath(), hmac, StandardOpenOption.CREATE);
     }
 }
